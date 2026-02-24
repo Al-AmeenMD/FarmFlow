@@ -40,6 +40,23 @@ function rowsToCamel(rows) {
     return (rows || []).map(toCamelCase);
 }
 
+/**
+ * Convert empty strings to null for columns that don't accept them
+ * (uuid, numeric, integer, date, etc.). Safe for text columns too —
+ * Postgres treats null and '' differently but forms often leave '' for optional fields.
+ */
+function sanitizeRow(row) {
+    const textColumns = new Set(['name', 'breed', 'source', 'pen', 'notes', 'description',
+        'category', 'feed_type', 'supplier', 'cause', 'phone', 'address', 'type',
+        'status', 'caption', 'photo']);
+    for (const key of Object.keys(row)) {
+        if (row[key] === '' && !textColumns.has(key)) {
+            row[key] = null;
+        }
+    }
+    return row;
+}
+
 // ─── CRUD Operations ────────────────────────────────────────────────────────
 
 /**
@@ -106,6 +123,7 @@ export async function addItem(table, item) {
     // Remove createdAt/updatedAt — Supabase handles these via defaults
     delete row.created_at;
     delete row.updated_at;
+    sanitizeRow(row);
 
     // Auto-inject user_id from auth session
     const { data: { user } } = await supabase.auth.getUser();
@@ -138,6 +156,7 @@ export async function addItems(table, items) {
         delete row.created_at;
         delete row.updated_at;
         if (user) row.user_id = user.id;
+        sanitizeRow(row);
         return row;
     });
 

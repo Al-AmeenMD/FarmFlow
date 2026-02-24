@@ -122,7 +122,7 @@ create table if not exists mortality_logs (
 create table if not exists weight_logs (
   id          uuid primary key default uuid_generate_v4(),
   batch_id    uuid references batches(id) on delete cascade,
-  weight      numeric not null default 0,
+  avg_weight  numeric not null default 0,
   sample_size integer,
   notes       text,
   date        date not null default current_date,
