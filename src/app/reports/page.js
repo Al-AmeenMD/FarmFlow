@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Header from '@/components/Header';
 import Modal from '@/components/Modal';
-import { BarChart3, Download, Upload, Bird, DollarSign, Skull, Scale, Loader2 } from 'lucide-react';
+import { BarChart3, Download, Upload, Trash2, Bird, DollarSign, Skull, Scale, Loader2 } from 'lucide-react';
 import { getItems, addItems, clearTable, TABLES } from '@/lib/supabase-storage';
 import {
     formatCurrency, formatNumber, formatDate, calculateMortalityRate,
@@ -271,6 +271,17 @@ export default function ReportsPage() {
                     </button>
                     <button className="btn btn-secondary" onClick={() => setShowImportModal(true)}>
                         <Upload size={16} /> Import Backup
+                    </button>
+                    <button className="btn btn-danger" onClick={async () => {
+                        if (!confirm('⚠️ This will permanently delete ALL your farm data. Are you sure?')) return;
+                        const typed = prompt('Type DELETE to confirm:');
+                        if (typed !== 'DELETE') { alert('Cancelled.'); return; }
+                        const tables = Object.values(TABLES);
+                        await Promise.all(tables.map(t => clearTable(t)));
+                        await loadData();
+                        alert('All data has been deleted.');
+                    }}>
+                        <Trash2 size={16} /> Delete All Data
                     </button>
                 </div>
 
