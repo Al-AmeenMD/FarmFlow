@@ -14,13 +14,13 @@ function AppShell({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isLoginPage = pathname === '/login';
+  const isAuthPage = pathname === '/login' || pathname === '/reset-password' || pathname === '/update-password';
 
   useEffect(() => {
-    if (!loading && !user && !isLoginPage) {
+    if (!loading && !user && !isAuthPage) {
       router.replace('/login');
     }
-  }, [loading, user, isLoginPage, router]);
+  }, [loading, user, isAuthPage, router]);
 
   // Loading auth state
   if (loading) {
@@ -31,8 +31,8 @@ function AppShell({ children }) {
     );
   }
 
-  // Login page — no sidebar
-  if (isLoginPage) {
+  // Auth pages — no sidebar
+  if (isAuthPage) {
     return children;
   }
 

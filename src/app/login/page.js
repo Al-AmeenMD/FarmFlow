@@ -188,6 +188,19 @@ export default function LoginPage() {
                         </button>
                     </form>
 
+                    {/* Forgot password link */}
+                    {mode === 'signin' && (
+                        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '12px', marginBottom: 0 }}>
+                            <button
+                                type="button"
+                                onClick={() => router.push('/reset-password')}
+                                style={styles.toggleBtn}
+                            >
+                                Forgot your password?
+                            </button>
+                        </p>
+                    )}
+
                     {/* Toggle */}
                     <p style={styles.toggleText}>
                         {mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
