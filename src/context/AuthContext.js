@@ -2,12 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getSupabase } from '@/lib/supabase';
+import { checkIsAdmin } from '@/lib/admin-storage';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         const supabase = getSupabase();
@@ -20,11 +22,19 @@ export function AuthProvider({ children }) {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setUser(session?.user ?? null);
             setLoading(false);
+            if (session?.user) {
+                checkIsAdmin().then(setIsAdmin);
+            }
         });
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user ?? null);
+            if (session?.user) {
+                checkIsAdmin().then(setIsAdmin);
+            } else {
+                setIsAdmin(false);
+            }
         });
 
         return () => subscription.unsubscribe();
@@ -69,7 +79,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut, resetPassword, updatePassword }}>
+        <AuthContext.Provider value={{ user, loading, isAdmin, signUp, signIn, signOut, resetPassword, updatePassword }}>
             {children}
         </AuthContext.Provider>
     );

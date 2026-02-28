@@ -18,7 +18,8 @@ import {
     Sun,
     ChevronsLeft,
     ChevronsRight,
-    LogOut
+    LogOut,
+    Shield
 } from 'lucide-react';
 
 const navItems = [
@@ -50,8 +51,18 @@ export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const { isOpen, isCollapsed, close, toggleCollapse } = useSidebar();
-    const { signOut } = useAuth();
+    const { signOut, isAdmin } = useAuth();
     const [isDark, setIsDark] = useState(false);
+
+    const allNavItems = isAdmin ? [
+        ...navItems,
+        {
+            section: 'Admin',
+            items: [
+                { href: '/admin', label: 'Admin Dashboard', icon: Shield },
+            ]
+        }
+    ] : navItems;
 
     useEffect(() => {
         const saved = localStorage.getItem('farm_theme');
@@ -85,7 +96,7 @@ export default function Sidebar() {
                 </div>
 
                 <nav className="sidebar-nav">
-                    {navItems.map((section) => (
+                    {allNavItems.map((section) => (
                         <div key={section.section}>
                             {!isCollapsed && <div className="sidebar-section-title">{section.section}</div>}
                             {isCollapsed && <div className="sidebar-section-divider" />}
